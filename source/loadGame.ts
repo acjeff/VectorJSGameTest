@@ -8,20 +8,21 @@ import {Interactive, getScriptName} from './index.js';
 
 // Initialize the interactive
 let interactive = new Interactive(getScriptName()),
-    scale = 0.1,
-    startingPosX = 0,
-    startingPosY = 0,
-    cameraSpeed = 4 * scale,
-    moveSpeed = 5 * scale,
-    jumpingSpeed = 20 * scale,
-    gravity = 15 * scale,
-    playerHeight = 50 * scale,
-    playerWidth = 50 * scale,
-    viewX = interactive.x,
-    viewY = interactive.y,
-    viewSize = 300,
-    cameraPadding = 10,
-    player = interactive.rectangle(startingPosX, startingPosY, playerHeight, playerWidth);
+    scale: number = 0.1,
+    startingPosX: number = 0,
+    startingPosY: number = 0,
+    cameraSpeed: number = Math.round((4 * scale) * 100) / 100,
+    moveSpeed: number = Math.round((5 * scale) * 100) / 100,
+    jumpingSpeed: number = Math.round((20 * scale) * 100) / 100,
+    gravity: number = Math.round((15 * scale) * 100) / 100,
+    playerHeight: number = Math.round((50 * scale) * 100) / 100,
+    playerWidth: number = Math.round((50 * scale) * 100) / 100,
+    viewX: number = Math.round(interactive.x),
+    viewY: number = Math.round(interactive.y),
+    viewSize: number = 100,
+    cameraPadding: number = 10,
+    movingCameraToPlayerCenter: boolean = false,
+    player = interactive.rectangle(startingPosX, startingPosY, playerWidth, playerHeight);
 
 interactive.border = true;
 interactive.width = window.innerWidth - 100;
@@ -33,7 +34,7 @@ player.style.fill = 'red';
 
 let _platforms = [
     {
-        width: 200,
+        width: 1000,
         height: 50,
         x: 0,
         y: interactive.height - 50
@@ -79,8 +80,15 @@ _platforms = _platforms.map((p) => {
 })
 
 window.addEventListener("wheel", event => {
-    viewSize+=event.deltaY;
-    console.info(event.deltaY)
+    let scrollAmount = event.deltaY;
+    if (scrollAmount > 0) scrollAmount = 10;
+    else (scrollAmount) = -10;
+    let newView = viewSize + scrollAmount;
+    if (newView > 500) newView = 500;
+    else if (newView < 30) newView = 30;
+    viewSize = Math.round(newView);
+    console.log(viewSize, ' : new view');
+    moveCameraToPlayerCenter();
 });
 
 let stateEngine = {
@@ -119,19 +127,24 @@ function checkCollisions(onGround) {
     stateEngine.states.touchingSurface.bottom = !!(onBottom);
 }
 
+function moveCameraToPlayerCenter() {
+    movingCameraToPlayerCenter = true;
+}
+
 function moveCamera() {
     let camera = interactive.viewBox.split(' '),
-        cameraX = parseInt(camera[0]), cameraY = parseInt(camera[1]), cameraWidth = parseInt(camera[2]),
-        cameraHeight = parseInt(camera[3]),
-        middleCameraX = cameraX + (cameraWidth / 2),
-        middleCameraY = cameraY + (cameraHeight / 2),
-        middlePlayerX = player.x + (player.width / 2),
-        middlePlayerY = player.y + (player.height / 2);
-    if (middlePlayerX > middleCameraX + cameraPadding) viewX += cameraSpeed;
-    if (middlePlayerX < middleCameraX - cameraPadding) viewX -= cameraSpeed;
-    if (middlePlayerY > middleCameraY + cameraPadding) viewY += cameraSpeed;
-    if (middlePlayerY < middleCameraY - cameraPadding) viewY -= cameraSpeed;
+        cameraX = Math.round(parseInt(camera[0])), cameraY = Math.round(parseInt(camera[1])), cameraWidth = Math.round(parseInt(camera[2])),
+        cameraHeight = Math.round(parseInt(camera[3])),
+        middleCameraX = Math.round(cameraX + (cameraWidth / 2)),
+        middleCameraY = Math.round(cameraY + (cameraHeight / 2)),
+        middlePlayerX = Math.round(player.x + (player.width / 2)),
+        middlePlayerY = Math.round(player.y + (player.height / 2));
+    if (middlePlayerX > middleCameraX + (!movingCameraToPlayerCenter ? cameraPadding : 0)) viewX += (!movingCameraToPlayerCenter ? cameraSpeed : Math.round(cameraSpeed * 3));
+    if (middlePlayerX < middleCameraX - (!movingCameraToPlayerCenter ? cameraPadding : 0)) viewX -= (!movingCameraToPlayerCenter ? cameraSpeed : Math.round(cameraSpeed * 3));
+    if (middlePlayerY > middleCameraY + (!movingCameraToPlayerCenter ? cameraPadding : 0)) viewY += (!movingCameraToPlayerCenter ? cameraSpeed : Math.round(cameraSpeed * 3));
+    if (middlePlayerY < middleCameraY - (!movingCameraToPlayerCenter ? cameraPadding : 0)) viewY -= (!movingCameraToPlayerCenter ? cameraSpeed : Math.round(cameraSpeed * 3));
 
+    if (Math.round(middleCameraX) === Math.round(middlePlayerX) && Math.round(middleCameraY) === Math.round(middlePlayerY)) movingCameraToPlayerCenter = false;
     interactive.setViewBox(viewX, viewY, viewSize, viewSize);
 }
 
