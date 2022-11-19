@@ -29,14 +29,14 @@ interactive.height = window.innerHeight - 30;
 interactive.originX = 0;
 interactive.originY = 0;
 
-player.style.fill = 'red';
+player.style.fill = randomColour();
 
 let _platforms = [
     {
-        width: 1000,
+        width: 1100,
         height: 50,
         x: 0,
-        y: interactive.height - 50
+        y: interactive.height
     },
     {
         width: 100,
@@ -106,10 +106,18 @@ let stateEngine = {
     }
 }
 
+function randomColourValue() {
+    return Math.floor(Math.random() * 256);
+}
+
+function randomColour() { // min and max included
+    return 'rgb(' + randomColourValue() + ', ' + randomColourValue() + ', ' + randomColourValue() + ')';
+}
+
 function placePlatforms(platforms) {
     platforms.forEach((platform) => {
         let platformRectangle = interactive.rectangle(platform.x, platform.y, platform.width, platform.height);
-        platformRectangle.style.fill = 'green';
+        platformRectangle.style.fill = randomColour();
     });
 }
 
