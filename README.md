@@ -1,56 +1,24 @@
+**Sources**
 
-**Warning:** the `master` branch is in an unstable state. Currently, the `development` branch represents the future of this project.
+Using this for everything vector related https://vectorjs.org
 
-# Vector.js
+**Get Started**
 
-Vector.js is a Javascript library for creating interactive graphics on the web. The library uses the existing web standards: HTML, SVG, and CSS and has no dependencies. See the [Website](https://vectorjs.org) for getting started, examples, and more.
+1. npm install
+2. Run build.sh
+3. tsc -w
+4. open index.html in browser
 
-## Development
+**Current Controls**
 
-Clone the repository to your local environment.
+a/d or l/r arrows to move
+space bar to jump
+scroll to zoom in/out
 
-```
-git clone https://github.com/vector-js/vector.git
-```
+**Notes**
 
-Install NPM dependencies
+All code so far is in svg-clip-path.ts
 
-```
-npm install
-```
+Needs tidying up etc. obvs
 
-Build the library
-
-```
-npm run build
-```
-
-Then start a local server to view the examples in the "index.html" page.
-
-```
-npm start
-```
-
-## Web Site Development
-
-Navigate into the website folder
-
-```
-cd website
-```
-
-Serve a local version of the site
-
-```
-hugo server
-```
-
-## Tools
-
-- [hugo](https://gohugo.io/)
-- [typescript](https://www.typescriptlang.org/index.html)
-- [typedoc](https://typedoc.org/)
-
-## Acknowledgements
-
-Big shout out to [Tania Rascia](https://github.com/taniarascia) for her SCSS boilerplate, New Moon Syntax Theme, and inspiration.
+Main things to work out next is to improve collisions to include only triggering when actually touching not just overlapping on x or y axis.
