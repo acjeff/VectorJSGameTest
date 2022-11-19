@@ -1,3 +1,0 @@
-{{ $sass := resources.Get "scss/main.scss" }}
-{{ $style := $sass | resources.ToCSS }}
-<link href="{{ $style.RelPermalink }}" rel="stylesheet" media="screen">

@@ -17,7 +17,7 @@ scroll to zoom in/out
 
 **Notes**
 
-All code so far is in svg-clip-path.ts
+All code so far is in loadGame.ts
 
 Needs tidying up etc. obvs
 
