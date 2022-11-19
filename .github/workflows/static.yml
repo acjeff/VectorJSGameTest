@@ -36,11 +36,14 @@ jobs:
         uses: EPMatt/reviewdog-action-tsc@v1.3.0
       - name: Setup Pages
         uses: actions/configure-pages@v2
-      - name: Upload artifact
+      - name: Upload Dist
         uses: actions/upload-pages-artifact@v1
         with:
-          # Upload entire repository
-          path: '.'
+          path: 'dist'
+      - name: Upload Index
+          uses: actions/upload-pages-artifact@v1
+          with:
+            path: 'index.html'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
