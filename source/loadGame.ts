@@ -24,9 +24,8 @@ let interactive = new Interactive(getScriptName()),
     movingCameraToPlayerCenter: boolean = false,
     player = interactive.rectangle(startingPosX, startingPosY, playerWidth, playerHeight);
 
-interactive.border = true;
-interactive.width = window.innerWidth - 100;
-interactive.height = window.innerHeight - 100;
+interactive.width = window.innerWidth - 30;
+interactive.height = window.innerHeight - 30;
 interactive.originX = 0;
 interactive.originY = 0;
 
