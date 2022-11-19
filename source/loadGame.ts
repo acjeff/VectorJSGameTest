@@ -115,12 +115,12 @@ function placePlatforms(platforms) {
 }
 
 function checkCollisions(onGround) {
-    let onLeft = _platforms.find((p) => player.x + -1 <= (p.x + p.width) && player.x + -1 > p.x && (player.y + (playerHeight / 2)) >= p.y);
-    let onRight = _platforms.find((p) => (player.x + playerWidth) >= p.x + -1 && (player.y + (playerHeight / 2)) >= p.y && ((player.x + playerWidth) <= (p.x + -1 + (p.width))));
-    let onBottom = _platforms.find((p) => ((player.y + playerHeight) >= p.y + -1) && ((player.x + playerWidth) >= (p.x)) && (player.x <= (p.x + p.width))) || onGround;
-    if (onRight && (player.x + playerWidth) >= onRight.x && (player.x + playerWidth) <= (onRight.x + onRight.width)) player.x = (onRight.x - playerWidth) - 1;
-    if (onLeft && player.x <= (onLeft.x + onLeft.width) && player.x >= onLeft.x) player.x = (onLeft.x + onLeft.width) + 1;
-    if (onBottom && (player.y + playerHeight) >= onBottom.y && (player.y + playerHeight) <= (onBottom.y + onBottom.height)) player.y = (onBottom.y - playerHeight) - 1;
+    let onLeft = _platforms.find((p) => player.x + -scale <= (p.x + p.width) && player.x + -scale > p.x && (player.y + (playerHeight / 2)) >= p.y);
+    let onRight = _platforms.find((p) => (player.x + playerWidth) >= p.x + -scale && (player.y + (playerHeight / 2)) >= p.y && ((player.x + playerWidth) <= (p.x + -scale + (p.width))));
+    let onBottom = _platforms.find((p) => ((player.y + playerHeight) >= p.y + -scale) && ((player.x + playerWidth) >= (p.x)) && (player.x <= (p.x + p.width))) || onGround;
+    if (onRight && (player.x + playerWidth) >= onRight.x && (player.x + playerWidth) <= (onRight.x + onRight.width)) player.x = (onRight.x - playerWidth) - scale;
+    if (onLeft && player.x <= (onLeft.x + onLeft.width) && player.x >= onLeft.x) player.x = (onLeft.x + onLeft.width) + scale;
+    if (onBottom && (player.y + playerHeight) >= onBottom.y && (player.y + playerHeight) <= (onBottom.y + onBottom.height)) player.y = (onBottom.y - playerHeight) - scale;
 
     stateEngine.states.touchingSurface.right = !!(onRight);
     stateEngine.states.touchingSurface.left = !!(onLeft);
