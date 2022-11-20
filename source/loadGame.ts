@@ -7,8 +7,14 @@
 import {Interactive, getScriptName} from './index.js';
 
 // Initialize the interactive
-let interactive = new Interactive(getScriptName()),
-    scale: number = 0.1,
+let interactive = new Interactive(getScriptName())
+interactive.width = window.innerWidth - 30;
+interactive.height = window.innerHeight - 30;
+interactive.originX = 0;
+interactive.originY = 0;
+interactive.border = true;
+
+let scale: number = 0.1,
     startingPosX: number = 0,
     startingPosY: number = 0,
     cameraSpeed: number = Math.round((4 * scale) * 100) / 100,
@@ -22,51 +28,59 @@ let interactive = new Interactive(getScriptName()),
     viewSize: number = 100,
     cameraPadding: number = 10,
     movingCameraToPlayerCenter: boolean = false,
+    drawingPlatform: boolean = false,
+    editingPlatformIndex: number = -1,
     player = interactive.rectangle(startingPosX, startingPosY, playerWidth, playerHeight);
 
-interactive.width = window.innerWidth - 30;
-interactive.height = window.innerHeight - 30;
-interactive.originX = 0;
-interactive.originY = 0;
-
 player.style.fill = randomColour();
-
+let _platforms_interactive = [];
 let _platforms = [
     {
         width: 1100,
         height: 50,
         x: 0,
-        y: interactive.height
+        y: interactive.height,
+        beingResized: false,
+        selected: false
     },
     {
         width: 100,
         height: 150,
         x: 300,
-        y: interactive.height - 150
+        y: interactive.height - 150,
+        beingResized: false,
+        selected: false
     },
     {
         width: 100,
         height: 250,
         x: 500,
-        y: interactive.height - 250
+        y: interactive.height - 250,
+        beingResized: false,
+        selected: false
     },
     {
         width: 100,
         height: 300,
         x: 600,
-        y: interactive.height - 300
+        y: interactive.height - 300,
+        beingResized: false,
+        selected: false
     },
     {
         width: 100,
         height: 300,
         x: 800,
-        y: interactive.height - 300
+        y: interactive.height - 300,
+        beingResized: false,
+        selected: false
     },
     {
         width: 100,
         height: 300,
         x: 1000,
-        y: interactive.height - 300
+        y: interactive.height - 300,
+        beingResized: false
     }
 ]
 
@@ -89,6 +103,44 @@ window.addEventListener("wheel", event => {
     console.log(viewSize, ' : new view');
     moveCameraToPlayerCenter();
 });
+
+interactive.root.onmousedown = event => {
+    console.log('Mouse Down');
+    console.log(event, ' : event');
+    console.log(event.x, ' : event x');
+    console.log(event.y, ' : event y');
+    console.log(viewX, ' : view x');
+    let group = document.getElementById('group-1');
+    let groupCoords = group.getBoundingClientRect();
+    console.log(group, ' : group');
+    console.log(group.getBoundingClientRect(), ' : bounding');
+    let x = (event.x - groupCoords.x) * scale;
+    console.log(x, ' : x')
+    if (!drawingPlatform) {
+        createPlatform({
+            width: 100 * scale,
+            height: 100 * scale,
+            x: x,
+            y: (interactive.height - 100) * scale
+        })
+        editingPlatformIndex = _platforms_interactive.length - 1;
+        drawingPlatform = true;
+    }
+};
+
+interactive.root.onmouseup = event => {
+    console.log('Mouse Up');
+    drawingPlatform = false;
+    editingPlatformIndex = -1;
+};
+
+interactive.root.onmousemove = event => {
+    if (drawingPlatform && editingPlatformIndex > -1) {
+        let platformBeingEdited = _platforms_interactive[editingPlatformIndex];
+        // platformBeingEdited.width = event.x - platformBeingEdited.x;
+        // platformBeingEdited.height = event.y - platformBeingEdited.y;
+    }
+};
 
 let stateEngine = {
     states: {
@@ -114,17 +166,21 @@ function randomColour() { // min and max included
     return 'rgb(' + randomColourValue() + ', ' + randomColourValue() + ', ' + randomColourValue() + ')';
 }
 
-function placePlatforms(platforms) {
+function createPlatform(platform) {
+    _platforms_interactive.push(interactive.rectangle(platform.x, platform.y, platform.width, platform.height));
+    _platforms_interactive[_platforms_interactive.length - 1].style.fill = randomColour();
+}
+
+function placeInitialPlatforms(platforms) {
     platforms.forEach((platform) => {
-        let platformRectangle = interactive.rectangle(platform.x, platform.y, platform.width, platform.height);
-        platformRectangle.style.fill = randomColour();
+        createPlatform(platform)
     });
 }
 
 function checkCollisions(onGround) {
-    let onLeft = _platforms.find((p) => player.x + -scale <= (p.x + p.width) && player.x + -scale > p.x && (player.y + (playerHeight / 2)) >= p.y);
-    let onRight = _platforms.find((p) => (player.x + playerWidth) >= p.x + -scale && (player.y + (playerHeight / 2)) >= p.y && ((player.x + playerWidth) <= (p.x + -scale + (p.width))));
-    let onBottom = _platforms.find((p) => ((player.y + playerHeight) >= p.y + -scale) && ((player.x + playerWidth) >= (p.x)) && (player.x <= (p.x + p.width))) || onGround;
+    let onLeft = _platforms_interactive.find((p) => player.x + -scale <= (p.x + p.width) && player.x + -scale > p.x && (player.y + (playerHeight / 2)) >= p.y);
+    let onRight = _platforms_interactive.find((p) => (player.x + playerWidth) >= p.x + -scale && (player.y + (playerHeight / 2)) >= p.y && ((player.x + playerWidth) <= (p.x + -scale + (p.width))));
+    let onBottom = _platforms_interactive.find((p) => ((player.y + playerHeight) >= p.y + -scale) && ((player.x + playerWidth) >= (p.x)) && (player.x <= (p.x + p.width))) || onGround;
     if (onRight && (player.x + playerWidth) >= onRight.x && (player.x + playerWidth) <= (onRight.x + onRight.width)) player.x = (onRight.x - playerWidth) - scale;
     if (onLeft && player.x <= (onLeft.x + onLeft.width) && player.x >= onLeft.x) player.x = (onLeft.x + onLeft.width) + scale;
     if (onBottom && (player.y + playerHeight) >= onBottom.y && (player.y + playerHeight) <= (onBottom.y + onBottom.height)) player.y = (onBottom.y - playerHeight) - scale;
@@ -140,7 +196,8 @@ function moveCameraToPlayerCenter() {
 
 function moveCamera() {
     let camera = interactive.viewBox.split(' '),
-        cameraX = Math.round(parseInt(camera[0])), cameraY = Math.round(parseInt(camera[1])), cameraWidth = Math.round(parseInt(camera[2])),
+        cameraX = Math.round(parseInt(camera[0])), cameraY = Math.round(parseInt(camera[1])),
+        cameraWidth = Math.round(parseInt(camera[2])),
         cameraHeight = Math.round(parseInt(camera[3])),
         middleCameraX = Math.round(cameraX + (cameraWidth / 2)),
         middleCameraY = Math.round(cameraY + (cameraHeight / 2)),
@@ -189,7 +246,7 @@ function runFrame() {
     window.requestAnimationFrame(runFrame);
 }
 
-placePlatforms(_platforms);
+placeInitialPlatforms(_platforms);
 
 window.requestAnimationFrame(runFrame);
 
