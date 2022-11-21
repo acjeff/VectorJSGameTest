@@ -34,21 +34,23 @@ let scale: number,
     jumpTime: number,
     player,
     o_playerX = 0,
-    o_playerY = 0
+    o_playerY = 0,
+    new_playerX = 0,
+    new_playerY = 0
 
 function resetValues(newValues?) {
     if (!newValues) newValues = {};
     scale = newValues['scale'] || scale || 1
     startingPosX = newValues['startingPosX'] || startingPosX || 0
     startingPosY = newValues['startingPosY'] || startingPosY || 0
-    cameraSpeed = newValues['cameraSpeed'] || Math.round((4 * scale) * 100) / 100
-    moveSpeed = newValues['moveSpeed'] || Math.round((5 * scale) * 100) / 100
-    jumpingSpeed = newValues['jumpingSpeed'] || Math.round((20 * scale) * 100) / 100
-    gravity = newValues['gravity'] || gravity || Math.round((15 * scale) * 100) / 100
-    playerHeight = newValues['playerHeight'] || Math.round((50 * scale) * 100) / 100
-    playerWidth = newValues['playerWidth'] || Math.round((50 * scale) * 100) / 100
-    viewX = newValues['viewX'] || viewX || Math.round(interactive.x)
-    viewY = newValues['viewY'] || viewY || Math.round(interactive.y)
+    cameraSpeed = newValues['cameraSpeed'] || round(4 * scale)
+    moveSpeed = newValues['moveSpeed'] || round(5 * scale)
+    jumpingSpeed = newValues['jumpingSpeed'] || round(20 * scale)
+    gravity = newValues['gravity'] || gravity || round(15 * scale)
+    playerHeight = newValues['playerHeight'] || round(50 * scale)
+    playerWidth = newValues['playerWidth'] || round(50 * scale)
+    viewX = newValues['viewX'] || viewX || round(interactive.x)
+    viewY = newValues['viewY'] || viewY || round(interactive.y)
     viewWidth = newValues['viewWidth'] || viewWidth || interactive.width
     viewHeight = newValues['viewHeight'] || viewHeight || interactive.height
     cameraPadding = newValues['cameraPadding'] || cameraPadding || 10
@@ -146,12 +148,16 @@ let _platforms = [
 resetValues();
 player.style.fill = randomColour();
 
+function round(val) {
+    return Math.round(val * 100) / 100;
+}
+
 function setPlatforms() {
     _platforms = _platforms.map((p) => {
-        p.width = p.o_width * scale;
-        p.height = p.o_height * scale;
-        p.x = p.o_x * scale;
-        p.y = p.o_y * scale;
+        p.width = round(p.o_width * scale);
+        p.height = round(p.o_height * scale);
+        p.x = round(p.o_x * scale);
+        p.y = round(p.o_y * scale);
         return p;
     })
 }
@@ -159,10 +165,10 @@ function setPlatforms() {
 function resetPlatforms() {
     setPlatforms();
     _platforms_interactive.forEach((p, i) => {
-        p.width = _platforms[i].width;
-        p.height = _platforms[i].height;
-        p.x = _platforms[i].x;
-        p.y = _platforms[i].y;
+        p.width = round(_platforms[i].width);
+        p.height = round(_platforms[i].height);
+        p.x = round(_platforms[i].x);
+        p.y = round(_platforms[i].y);
     })
 }
 
@@ -170,7 +176,7 @@ window.addEventListener("wheel", event => {
     let scrollAmount = event.deltaY;
     if (scrollAmount > 0) scrollAmount = 0.1;
     else (scrollAmount) = -0.1;
-    resetValues({scale: Math.round((scale + scrollAmount) * 100) / 100});
+    resetValues({scale: round(scale + scrollAmount)});
     moveCameraToPlayerCenter();
 });
 
@@ -186,14 +192,14 @@ interactive.root.onmouseup = event => {
 interactive.root.onmousemove = event => {
     if (drawingPlatform) {
         createPlatform({
-            width: 10,
-            o_width: 10,
-            height: 10,
-            o_height: 10,
-            x: ((event.x + viewX) - 5) / scale,
-            o_x: ((event.x + viewX) - 5) / scale,
-            y: ((event.y + viewY) - 5) / scale,
-            o_y: ((event.y + viewY) - 5) / scale
+            width: 100,
+            o_width: 100,
+            height: 100,
+            o_height: 100,
+            x: round(((event.x + viewX) - 5) / scale),
+            o_x: round(((event.x + viewX) - 5) / scale),
+            y: round(((event.y + viewY) - 5) / scale),
+            o_y: round(((event.y + viewY) - 5) / scale)
         }, '#000000', true);
         editingPlatformIndex = _platforms_interactive.length - 1;
     }
@@ -253,12 +259,22 @@ function placeInitialPlatforms(platforms) {
 }
 
 function checkCollisions() {
-    let onLeft = _platforms_interactive.find((p) => player.x + -scale <= (p.x + p.width) && player.x + -scale > p.x && (player.y + (playerHeight / 2)) >= p.y);
-    let onRight = _platforms_interactive.find((p) => (player.x + playerWidth) >= p.x + -scale && (player.y + (playerHeight / 2)) >= p.y && ((player.x + playerWidth) <= (p.x + -scale + (p.width))));
-    let onBottom = _platforms_interactive.find((p) => ((player.y + playerHeight) >= p.y + -scale) && ((player.x + playerWidth) >= (p.x)) && (player.x <= (p.x + p.width)));
-    if (onRight && (player.x + playerWidth) >= onRight.x && (player.x + playerWidth) <= (onRight.x + onRight.width)) player.x = (onRight.x - playerWidth) - scale;
-    if (onLeft && player.x <= (onLeft.x + onLeft.width) && player.x >= onLeft.x) player.x = (onLeft.x + onLeft.width) + scale;
-    if (onBottom && (player.y + playerHeight) >= onBottom.y && (player.y + playerHeight) <= (onBottom.y + onBottom.height)) player.y = (onBottom.y - playerHeight) - scale;
+    let onBottom = _platforms_interactive.find((p) => {
+        return (new_playerY + playerHeight >= p.y && player.y + playerHeight <= p.y) && ((player.x + playerWidth) >= (p.x)) && (player.x <= (p.x + p.width));
+    });
+    if (onBottom) player.y = onBottom.y - playerHeight;
+    else player.y = new_playerY;
+
+    let onRight = _platforms_interactive.find((p) => {
+        return (new_playerX + playerWidth >= p.x && player.x + playerWidth <= p.x && ((player.y > p.y && player.y < p.y + p.height) || (player.y + playerHeight > p.y && player.y + playerHeight < p.y + p.height)));
+    });
+
+    let onLeft = _platforms_interactive.find((p) => {
+        return (new_playerX <= p.x + p.width && player.x >= p.x + p.width && ((player.y > p.y && player.y < p.y + p.height) || (player.y + playerHeight > p.y && player.y + playerHeight < p.y + p.height)));
+    });
+    if (onRight) player.x = onRight.x - playerWidth;
+    else if (onLeft) player.x = onLeft.x + onLeft.width;
+    else player.x = new_playerX;
 
     stateEngine.states.touchingSurface.right = !!(onRight);
     stateEngine.states.touchingSurface.left = !!(onLeft);
@@ -297,20 +313,20 @@ function triggerJump() {
 function movePlayer() {
     let jumpingForce = stateEngine.states.jumping ? 10 * scale : 0;
 
-    if (stateEngine.states.jumping) player.y -= jumpingSpeed;
+    if (stateEngine.states.jumping) new_playerY = player.y - jumpingSpeed;
     //Fall from Gravity
-    if (!stateEngine.states.jumping && !stateEngine.states.touchingSurface.bottom) player.y += gravity;
+    if (!stateEngine.states.jumping && !stateEngine.states.touchingSurface.bottom) new_playerY = player.y + gravity;
     //Move Left
-    if (!stateEngine.states.touchingSurface.left) if (stateEngine.states.movingLeft) player.x -= (moveSpeed + jumpingForce);
+    if (!stateEngine.states.touchingSurface.left) if (stateEngine.states.movingLeft) new_playerX = player.x - (moveSpeed + jumpingForce);
     //Move Right
-    if (!stateEngine.states.touchingSurface.right) if (stateEngine.states.movingRight) player.x += (moveSpeed + jumpingForce);
+    if (!stateEngine.states.touchingSurface.right) if (stateEngine.states.movingRight) new_playerX = player.x + (moveSpeed + jumpingForce);
 
 }
 
 function runFrame() {
-    checkCollisions();
-
     movePlayer();
+
+    checkCollisions();
 
     moveCamera();
 
