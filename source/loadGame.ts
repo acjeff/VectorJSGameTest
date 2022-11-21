@@ -262,8 +262,16 @@ function checkCollisions() {
     let onBottom = _platforms_interactive.find((p) => {
         return (new_playerY + playerHeight >= p.y && player.y + playerHeight <= p.y) && ((player.x + playerWidth) >= (p.x)) && (player.x <= (p.x + p.width));
     });
+
+    let onTop = _platforms_interactive.find((p) => {
+        return (new_playerY <= p.y + p.height && player.y >= p.y + p.height) && ((player.x + playerWidth) >= (p.x)) && (player.x <= (p.x + p.width));
+    });
+
     if (onBottom) player.y = onBottom.y - playerHeight;
-    else player.y = new_playerY;
+    else if (onTop) {
+        player.y = onTop.y + onTop.height + scale;
+        stateEngine.states.jumping = false;
+    } else player.y = new_playerY;
 
     let onRight = _platforms_interactive.find((p) => {
         return (new_playerX + playerWidth >= p.x && player.x + playerWidth <= p.x && ((player.y > p.y && player.y < p.y + p.height) || (player.y + playerHeight > p.y && player.y + playerHeight < p.y + p.height)));
@@ -272,6 +280,7 @@ function checkCollisions() {
     let onLeft = _platforms_interactive.find((p) => {
         return (new_playerX <= p.x + p.width && player.x >= p.x + p.width && ((player.y > p.y && player.y < p.y + p.height) || (player.y + playerHeight > p.y && player.y + playerHeight < p.y + p.height)));
     });
+
     if (onRight) player.x = onRight.x - playerWidth;
     else if (onLeft) player.x = onLeft.x + onLeft.width;
     else player.x = new_playerX;
