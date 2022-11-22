@@ -1,5 +1,5 @@
 import {startGame} from './loadGame.js'
-import {Interactive, getScriptName} from './index.js';
+import {Interactive} from './index.js';
 
 console.log('StartScreen');
 let interactive = new Interactive('StartScreen')
