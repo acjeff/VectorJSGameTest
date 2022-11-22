@@ -7,12 +7,7 @@
 import {Interactive, getScriptName} from './index.js';
 
 // Initialize the interactive
-let interactive = new Interactive(getScriptName())
-interactive.width = window.innerWidth - 30;
-interactive.height = window.innerHeight - 30;
-interactive.originX = 0;
-interactive.originY = 0;
-interactive.border = true;
+let interactive;
 
 let scale: number,
     startingPosX: number,
@@ -46,7 +41,7 @@ function resetValues(newValues?) {
     cameraSpeed = newValues['cameraSpeed'] || round(4 * scale)
     moveSpeed = newValues['moveSpeed'] || round(5 * scale)
     jumpingSpeed = newValues['jumpingSpeed'] || round(20 * scale)
-    gravity = newValues['gravity'] || gravity || round(15 * scale)
+    gravity = newValues['gravity'] || round(15 * scale)
     playerHeight = newValues['playerHeight'] || round(50 * scale)
     playerWidth = newValues['playerWidth'] || round(50 * scale)
     viewX = newValues['viewX'] || viewX || round(interactive.x)
@@ -70,83 +65,7 @@ function resetValues(newValues?) {
     else placeInitialPlatforms(_platforms);
 }
 
-let _platforms_interactive = [];
-let _platforms = [
-    {
-        width: 2100,
-        o_width: 2100,
-        height: 50,
-        o_height: 50,
-        x: 0,
-        o_x: 0,
-        y: interactive.height,
-        o_y: interactive.height,
-        beingResized: false,
-        selected: false
-    },
-    {
-        o_width: 100,
-        width: 100,
-        o_height: 150,
-        height: 150,
-        x: 300,
-        o_x: 300,
-        y: interactive.height - 150,
-        o_y: interactive.height - 150,
-        beingResized: false,
-        selected: false
-    },
-    {
-        width: 100,
-        o_width: 100,
-        height: 250,
-        o_height: 250,
-        x: 500,
-        o_x: 500,
-        y: interactive.height - 250,
-        o_y: interactive.height - 250,
-        beingResized: false,
-        selected: false
-    },
-    {
-        width: 100,
-        o_width: 100,
-        height: 300,
-        o_height: 300,
-        x: 600,
-        o_x: 600,
-        y: interactive.height - 300,
-        o_y: interactive.height - 300,
-        beingResized: false,
-        selected: false
-    },
-    {
-        width: 100,
-        o_width: 100,
-        height: 300,
-        o_height: 300,
-        x: 800,
-        o_x: 800,
-        y: interactive.height - 300,
-        o_y: interactive.height - 300,
-        beingResized: false,
-        selected: false
-    },
-    {
-        width: 100,
-        o_width: 100,
-        height: 300,
-        o_height: 300,
-        x: 1000,
-        o_x: 1000,
-        y: interactive.height - 300,
-        o_y: interactive.height - 300,
-        beingResized: false
-    }
-]
-
-resetValues();
-player.style.fill = randomColour();
+let _platforms_interactive, _platforms;
 
 function round(val) {
     return Math.round(val * 100) / 100;
@@ -171,51 +90,6 @@ function resetPlatforms() {
         p.y = round(_platforms[i].y);
     })
 }
-
-window.addEventListener("wheel", event => {
-    let scrollAmount = event.deltaY;
-    if (scrollAmount > 0) scrollAmount = 0.1;
-    else (scrollAmount) = -0.1;
-    resetValues({scale: round(scale + scrollAmount)});
-    moveCameraToPlayerCenter();
-});
-
-interactive.root.onmousedown = event => {
-    drawingPlatform = true;
-};
-
-interactive.root.onmouseup = event => {
-    drawingPlatform = false;
-    editingPlatformIndex = -1;
-};
-
-interactive.root.onmousemove = event => {
-    if (drawingPlatform) {
-        createPlatform({
-            width: 100,
-            o_width: 100,
-            height: 100,
-            o_height: 100,
-            x: round(((event.x + viewX) - 5) / scale),
-            o_x: round(((event.x + viewX) - 5) / scale),
-            y: round(((event.y + viewY) - 5) / scale),
-            o_y: round(((event.y + viewY) - 5) / scale)
-        }, '#000000', true);
-        editingPlatformIndex = _platforms_interactive.length - 1;
-    }
-
-};
-
-window.onkeydown = function (event) {
-    if (event.keyCode === 32 && !stateEngine.states.jumping && stateEngine.states.touchingSurface.bottom) triggerJump();
-    if (event.keyCode === 65 || event.keyCode === 37) stateEngine.states.movingLeft = true;
-    if (event.keyCode === 68 || event.keyCode === 39) stateEngine.states.movingRight = true;
-};
-
-window.onkeyup = function (event) {
-    if (event.keyCode === 65 || event.keyCode === 37) stateEngine.states.movingLeft = false;
-    if (event.keyCode === 68 || event.keyCode === 39) stateEngine.states.movingRight = false;
-};
 
 let stateEngine = {
     states: {
@@ -296,20 +170,25 @@ function moveCameraToPlayerCenter() {
 
 function moveCamera() {
     let camera = interactive.viewBox.split(' '),
-        cameraX = Math.round(parseInt(camera[0])), cameraY = Math.round(parseInt(camera[1])),
-        cameraWidth = Math.round(parseInt(camera[2])),
-        cameraHeight = Math.round(parseInt(camera[3])),
-        middleCameraX = Math.round(cameraX + (cameraWidth / 2)),
-        middleCameraY = Math.round(cameraY + (cameraHeight / 2)),
-        middlePlayerX = Math.round(player.x + (player.width / 2)),
-        middlePlayerY = Math.round(player.y + (player.height / 2));
-    if (middlePlayerX > middleCameraX + (!movingCameraToPlayerCenter ? cameraPadding : 0)) viewX += (!movingCameraToPlayerCenter ? cameraSpeed : Math.round(cameraSpeed * 3));
-    if (middlePlayerX < middleCameraX - (!movingCameraToPlayerCenter ? cameraPadding : 0)) viewX -= (!movingCameraToPlayerCenter ? cameraSpeed : Math.round(cameraSpeed * 3));
-    if (middlePlayerY > middleCameraY + (!movingCameraToPlayerCenter ? cameraPadding : 0)) viewY += (!movingCameraToPlayerCenter ? cameraSpeed : Math.round(cameraSpeed * 3));
-    if (middlePlayerY < middleCameraY - (!movingCameraToPlayerCenter ? cameraPadding : 0)) viewY -= (!movingCameraToPlayerCenter ? cameraSpeed : Math.round(cameraSpeed * 3));
+        cameraX = round(parseInt(camera[0])),
+        cameraY = round(parseInt(camera[1])),
+        o_viewX = viewX,
+        o_viewY = viewY,
+        cameraWidth = round(parseInt(camera[2])),
+        cameraHeight = round(parseInt(camera[3])),
+        middleCameraX = round(cameraX) + round(cameraWidth / 2),
+        middleCameraY = round(cameraY) + round(cameraHeight / 2),
+        middlePlayerX = round(player.x) + round(player.width / 2),
+        middlePlayerY = round(player.y) + round(player.height / 2);
+    if (round(middlePlayerX) > round(middleCameraX) + (!movingCameraToPlayerCenter ? cameraPadding : 0)) viewX += (!movingCameraToPlayerCenter ? round(cameraSpeed) : round(cameraSpeed * 3));
+    if (round(middlePlayerX) < round(middleCameraX) - (!movingCameraToPlayerCenter ? cameraPadding : 0)) viewX -= (!movingCameraToPlayerCenter ? round(cameraSpeed) : round(cameraSpeed * 3));
+    if (round(middlePlayerY) > round(middleCameraY) + (!movingCameraToPlayerCenter ? cameraPadding : 0)) viewY += (!movingCameraToPlayerCenter ? round(cameraSpeed) : round(cameraSpeed * 3));
+    if (round(middlePlayerY) < round(middleCameraY) - (!movingCameraToPlayerCenter ? cameraPadding : 0)) viewY -= (!movingCameraToPlayerCenter ? round(cameraSpeed) : round(cameraSpeed * 3));
 
-    if (Math.round(middleCameraX) === Math.round(middlePlayerX) && Math.round(middleCameraY) === Math.round(middlePlayerY)) movingCameraToPlayerCenter = false;
-    interactive.setViewBox(viewX, viewY, viewWidth, viewHeight);
+    if (round(middleCameraX) === round(middlePlayerX) && round(middleCameraY) === round(middlePlayerY)) movingCameraToPlayerCenter = false;
+    if (round(o_viewX) !== round(viewX) || round(o_viewY) !== round(viewY)) {
+        interactive.setViewBox(viewX, viewY, viewWidth, viewHeight);
+    }
 }
 
 function triggerJump() {
@@ -342,4 +221,136 @@ function runFrame() {
     window.requestAnimationFrame(runFrame);
 }
 
-window.requestAnimationFrame(runFrame);
+export function startGame() {
+    interactive = new Interactive('loadGame')
+    interactive.width = window.innerWidth - 30;
+    interactive.height = window.innerHeight - 30;
+    interactive.originX = 0;
+    interactive.originY = 0;
+    interactive.border = true;
+    _platforms_interactive = [];
+    _platforms  = [
+        {
+            width: 2100,
+            o_width: 2100,
+            height: 50,
+            o_height: 50,
+            x: 0,
+            o_x: 0,
+            y: interactive.height,
+            o_y: interactive.height,
+            beingResized: false,
+            selected: false
+        },
+        {
+            o_width: 100,
+            width: 100,
+            o_height: 150,
+            height: 150,
+            x: 300,
+            o_x: 300,
+            y: interactive.height - 150,
+            o_y: interactive.height - 150,
+            beingResized: false,
+            selected: false
+        },
+        {
+            width: 100,
+            o_width: 100,
+            height: 250,
+            o_height: 250,
+            x: 500,
+            o_x: 500,
+            y: interactive.height - 250,
+            o_y: interactive.height - 250,
+            beingResized: false,
+            selected: false
+        },
+        {
+            width: 100,
+            o_width: 100,
+            height: 300,
+            o_height: 300,
+            x: 600,
+            o_x: 600,
+            y: interactive.height - 300,
+            o_y: interactive.height - 300,
+            beingResized: false,
+            selected: false
+        },
+        {
+            width: 100,
+            o_width: 100,
+            height: 300,
+            o_height: 300,
+            x: 800,
+            o_x: 800,
+            y: interactive.height - 300,
+            o_y: interactive.height - 300,
+            beingResized: false,
+            selected: false
+        },
+        {
+            width: 100,
+            o_width: 100,
+            height: 300,
+            o_height: 300,
+            x: 1000,
+            o_x: 1000,
+            y: interactive.height - 300,
+            o_y: interactive.height - 300,
+            beingResized: false
+        }
+    ]
+
+    resetValues();
+
+    player.style.fill = randomColour();
+
+    window.addEventListener("wheel", event => {
+        let scrollAmount = event.deltaY;
+        if (scrollAmount > 0) scrollAmount = 0.1;
+        else (scrollAmount) = -0.1;
+        resetValues({scale: round(scale + scrollAmount)});
+        moveCameraToPlayerCenter();
+    });
+
+    interactive.root.onmousedown = event => {
+        // drawingPlatform = true;
+    };
+
+    interactive.root.onmouseup = event => {
+        drawingPlatform = false;
+        editingPlatformIndex = -1;
+    };
+
+    interactive.root.onmousemove = event => {
+        if (drawingPlatform) {
+            createPlatform({
+                width: 100,
+                o_width: 100,
+                height: 100,
+                o_height: 100,
+                x: round(((event.x + viewX) - 5) / scale),
+                o_x: round(((event.x + viewX) - 5) / scale),
+                y: round(((event.y + viewY) - 5) / scale),
+                o_y: round(((event.y + viewY) - 5) / scale)
+            }, '#000000', true);
+            editingPlatformIndex = _platforms_interactive.length - 1;
+        }
+
+    };
+
+    window.onkeydown = function (event) {
+        if (event.keyCode === 32 && !stateEngine.states.jumping && stateEngine.states.touchingSurface.bottom) triggerJump();
+        if (event.keyCode === 65 || event.keyCode === 37) stateEngine.states.movingLeft = true;
+        if (event.keyCode === 68 || event.keyCode === 39) stateEngine.states.movingRight = true;
+    };
+
+    window.onkeyup = function (event) {
+        if (event.keyCode === 65 || event.keyCode === 37) stateEngine.states.movingLeft = false;
+        if (event.keyCode === 68 || event.keyCode === 39) stateEngine.states.movingRight = false;
+    };
+
+    window.requestAnimationFrame(runFrame);
+}
