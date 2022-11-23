@@ -54,6 +54,8 @@ function movePlayer() {
 }
 
 function createPlayer(startingPosX, startingPosY, playerWidth, playerHeight) {
+    new_playerX = startingPosX;
+    new_playerY = startingPosY;
     player = getInteractive().rectangle(startingPosX, startingPosY, round(playerWidth * getScale()), round(playerHeight * getScale()));
     player.style.fill = randomColour();
 }

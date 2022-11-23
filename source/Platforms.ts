@@ -27,10 +27,8 @@ function resetPlatforms() {
     })
 }
 
-async function loadPlatforms() {
-    let platformDataReq = await fetch('source/world.json');
-    let platformData = await platformDataReq.json();
-    _platforms = platformData.Platforms;
+async function loadPlatforms(platforms) {
+    _platforms = platforms;
     setPlatforms();
     _platforms.forEach((platform) => {
         createPlatform(platform)

@@ -3,9 +3,14 @@ import {loadLights} from './Lights.js'
 import {createPlayer} from "./Player.js";
 import {watchInputs} from "./PlayerInput.js";
 
-export async function CreateWorld() {
-    await loadPlatforms();
-    await loadLights();
-    createPlayer(0, 0, 50, 50);
+export async function CreateWorld(saveData) {
+    let WorldDataReq = await fetch('source/world.json');
+    let WorldData = await WorldDataReq.json();
+    let LevelToLoad = WorldData.levels.find((l => l.Level = saveData.Player.Level));
+
+    await loadPlatforms(LevelToLoad.Platforms);
+    await loadLights(LevelToLoad.Lights);
+
+    createPlayer(saveData.Player.x, saveData.Player.y, 50, 50);
     watchInputs();
 }

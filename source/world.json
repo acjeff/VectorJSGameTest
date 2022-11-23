@@ -1,22 +1,28 @@
 {
-  "Platforms": [
+  "levels": [
     {
-      "width": 2100,
-      "o_width": 2100,
-      "height": 50,
-      "o_height": 50,
-      "x": 0,
-      "o_x": 0,
-      "y": 500,
-      "o_y": 500,
-      "beingResized": false,
-      "selected": false
-    }
-  ],
-  "Lights": [
-    {
-      "x": 100,
-      "y": 400
+      "Name": "The Beginning",
+      "Level": 1,
+      "Platforms": [
+        {
+          "width": 2100,
+          "o_width": 2100,
+          "height": 50,
+          "o_height": 50,
+          "x": 0,
+          "o_x": 0,
+          "y": 500,
+          "o_y": 500,
+          "beingResized": false,
+          "selected": false
+        }
+      ],
+      "Lights": [
+        {
+          "x": 100,
+          "y": 400
+        }
+      ]
     }
   ]
 }

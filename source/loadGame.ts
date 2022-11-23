@@ -4,6 +4,7 @@ import {movePlayer} from './Player.js'
 import {CreateWorld} from './World.js'
 import {checkCollisions} from './Collisions.js'
 import {adjustLighting} from './Lights.js'
+import {loadSaveFile} from "./FileManager.js";
 
 let interactive, frame_rate = 50, second = 1000, frames_per_second = Math.round(second / frame_rate);
 
@@ -33,7 +34,10 @@ async function startGame() {
     interactive.originY = 0;
     interactive.border = true;
 
-    await CreateWorld();
+    let saveData = await loadSaveFile();
+    console.log(saveData, ' : save data');
+
+    await CreateWorld(saveData);
 
     window.requestAnimationFrame(runFrame);
 }

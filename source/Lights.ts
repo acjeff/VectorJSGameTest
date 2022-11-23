@@ -1,9 +1,7 @@
 let _lights;
 
-async function loadLights() {
-    let lightsDataReq = await fetch('source/world.json');
-    let lightsData = await lightsDataReq.json();
-    _lights = lightsData.Lights;
+async function loadLights(lights) {
+   _lights = lights;
 }
 
 function adjustLighting() {
