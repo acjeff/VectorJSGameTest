@@ -8,4 +8,6 @@ interactive.originX = 0;
 interactive.originY = 0;
 interactive.border = true;
 
+interactive.remove();
+startGame();
 //PUT YOUR START SCREEN HERE :)
