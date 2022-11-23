@@ -1,5 +1,5 @@
 import {getInteractive} from "./loadGame.js";
-import {getScale} from "./PlayerInput.js";
+import {getScale, watchInputs} from "./PlayerInput.js";
 import {round, randomColour} from './Services.js';
 
 let player,
@@ -58,6 +58,7 @@ function createPlayer(startingPosX, startingPosY, playerWidth, playerHeight) {
     new_playerY = startingPosY;
     player = getInteractive().rectangle(startingPosX, startingPosY, round(playerWidth * getScale()), round(playerHeight * getScale()));
     player.style.fill = randomColour();
+    watchInputs();
 }
 
 function getStateEngine() {

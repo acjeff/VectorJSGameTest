@@ -1,7 +1,6 @@
 import {loadPlatforms} from './Platforms.js'
 import {loadLights} from './Lights.js'
 import {createPlayer} from "./Player.js";
-import {watchInputs} from "./PlayerInput.js";
 
 export async function CreateWorld(saveData) {
     let WorldDataReq = await fetch('source/world.json');
@@ -12,5 +11,4 @@ export async function CreateWorld(saveData) {
     await loadLights(LevelToLoad.Lights);
 
     createPlayer(saveData.Player.x, saveData.Player.y, 50, 50);
-    watchInputs();
 }

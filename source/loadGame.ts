@@ -9,6 +9,7 @@ import {loadSaveFile} from "./FileManager.js";
 let interactive, frame_rate = 50, second = 1000, frames_per_second = Math.round(second / frame_rate);
 
 function runFrame() {
+
     movePlayer();
 
     checkCollisions();
@@ -27,12 +28,11 @@ function getInteractive() {
 }
 
 async function startGame() {
-    interactive = new Interactive('loadGame')
+    interactive = new Interactive('loadGame');
     interactive.width = window.innerWidth - 30;
     interactive.height = window.innerHeight - 30;
     interactive.originX = 0;
     interactive.originY = 0;
-    interactive.border = true;
 
     let saveData = await loadSaveFile();
     console.log(saveData, ' : save data');
