@@ -27,8 +27,10 @@ function resetPlatforms() {
     })
 }
 
-function placeInitialPlatforms(platforms) {
-    if (!_platforms.length) _platforms = platforms;
+async function loadPlatforms() {
+    let platformDataReq = await fetch('source/world.json');
+    let platformData = await platformDataReq.json();
+    _platforms = platformData.Platforms;
     setPlatforms();
     _platforms.forEach((platform) => {
         createPlatform(platform)
@@ -51,7 +53,7 @@ function getPlatforms() {
 }
 
 export {
-    placeInitialPlatforms,
+    loadPlatforms,
     resetPlatforms,
     getPlatforms,
     createPlatform

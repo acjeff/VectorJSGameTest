@@ -1,12 +1,11 @@
 import {Interactive} from './index.js';
-import {watchInputs} from './PlayerInput.js'
 import {moveCamera} from './Camera.js'
-import {createPlayer, movePlayer} from './Player.js'
+import {movePlayer} from './Player.js'
 import {CreateWorld} from './World.js'
 import {checkCollisions} from './Collisions.js'
+import {adjustLighting} from './Lights.js'
 
-// Initialize the interactive
-let interactive;
+let interactive, frame_rate = 50, second = 1000, frames_per_second = Math.round(second / frame_rate);
 
 function runFrame() {
     movePlayer();
@@ -15,14 +14,18 @@ function runFrame() {
 
     moveCamera();
 
-    window.requestAnimationFrame(runFrame);
+    adjustLighting();
+
+    window.setTimeout(() => {
+        window.requestAnimationFrame(runFrame);
+    }, frames_per_second);
 }
 
 function getInteractive() {
     return interactive;
 }
 
-function startGame() {
+async function startGame() {
     interactive = new Interactive('loadGame')
     interactive.width = window.innerWidth - 30;
     interactive.height = window.innerHeight - 30;
@@ -30,11 +33,7 @@ function startGame() {
     interactive.originY = 0;
     interactive.border = true;
 
-    CreateWorld();
-
-    createPlayer(0, 0, 50, 50);
-
-    watchInputs();
+    await CreateWorld();
 
     window.requestAnimationFrame(runFrame);
 }

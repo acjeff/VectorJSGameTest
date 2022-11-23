@@ -9,5 +9,5 @@ interactive.originY = 0;
 interactive.border = true;
 
 interactive.remove();
-startGame();
+await startGame();
 //PUT YOUR START SCREEN HERE :)
