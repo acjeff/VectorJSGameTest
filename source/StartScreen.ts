@@ -22,3 +22,6 @@ let button = interactive.button(660, 550, "   ");
 let startText = interactive.text(725, 560, "Start Game");
 startText.style.fontSize = '30px'
 text.style.fontFamily = "monospace";
+
+interactive.remove();
+startGame();
