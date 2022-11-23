@@ -6,6 +6,8 @@ let _platforms_interactive = [], interactive, _platforms = [];
 
 function setPlatforms() {
     let scale = getScale();
+    console.log(scale, ' : scale');
+    console.log(_platforms, ' : _platforms');
     _platforms = _platforms.map((p) => {
         p.width = round(p.o_width * scale);
         p.height = round(p.o_height * scale);
@@ -26,8 +28,9 @@ function resetPlatforms() {
 }
 
 function placeInitialPlatforms(platforms) {
+    if (!_platforms.length) _platforms = platforms;
     setPlatforms();
-    platforms.forEach((platform) => {
+    _platforms.forEach((platform) => {
         createPlatform(platform)
     });
 }
