@@ -11,17 +11,21 @@ interactive.border = true;
 
 //PUT YOUR START SCREEN HERE :)
 
-let text = interactive.text(interactive.width / 3, interactive.height / 2, "SQUART");
+let text = interactive.text(0, 0, "SQUART");
 text.style.fontSize = '138px';
 text.style.textAlign = 'center';
 text.style.fontFamily = "monospace";
 
+// let button = interactive.button(660, 550, "   ");
+// button.width = '100%';
+// button.height = '100%';
 
-let button = interactive.button(660, 550, "   ");
+// let startText = interactive.text(725, 560, "Start Game");
+// startText.width = '100%';
+// startText.height = '100%';
+// startText.style.fontSize = '30px'
+// startText.textAlign = 'center';
+// text.style.fontFamily = "monospace";
 
-let startText = interactive.text(725, 560, "Start Game");
-startText.style.fontSize = '30px'
-text.style.fontFamily = "monospace";
-
-interactive.remove();
-startGame();
+// interactive.remove();
+// startGame();
